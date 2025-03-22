@@ -1,0 +1,29 @@
+name: Slack PR Notification
+
+on:
+  pull_request:
+    types: [opened, reopened]
+    # Filters to only trigger on PRs against gl-copy-site
+    branches:
+      - mirror
+
+jobs:
+  notify:
+    if: github.repository == 'smarvin/gl-copy-site'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Slack Notification
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "📣 New Pull Request Created: *${{ github.event.pull_request.title }}*",
+              "attachments": [
+                {
+                  "title": "View PR",
+                  "title_link": "${{ github.event.pull_request.html_url }}"
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
